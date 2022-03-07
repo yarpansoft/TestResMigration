@@ -11,7 +11,7 @@
     <properties>
         <testng.version>7.0.0</testng.version>
         <selenium.version>3.11.0</selenium.version>
-
+        <json-simple.version>1.1.1</json-simple.version>
         <aspectj.version>1.8.10</aspectj.version>
         <allure.version>2.17.3</allure.version>
         <allure-maven.version>2.11.2</allure-maven.version>
@@ -39,14 +39,21 @@
             <version>${selenium.version}</version>
         </dependency>
 
+        <!-- https://mvnrepository.com/artifact/com.googlecode.json-simple/json-simple -->
+        <dependency>
+            <groupId>com.googlecode.json-simple</groupId>
+            <artifactId>json-simple</artifactId>
+            <version>${json-simple.version}</version>
+        </dependency>
+
         <!-- https://mvnrepository.com/artifact/io.qameta.allure/allure-testng -->
         <dependency>
             <groupId>io.qameta.allure</groupId>
             <artifactId>allure-testng</artifactId>
             <version>${allure.version}</version>
         </dependency>
-
     </dependencies>
+
 
 
     <build>
@@ -80,9 +87,6 @@
                     </dependency>
                 </dependencies>
             </plugin>
-
-
-
 
             <plugin>
                 <groupId>io.qameta.allure</groupId>

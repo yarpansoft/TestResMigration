@@ -1,3 +1,5 @@
+package WebTest;
+
 public class TestData {
     public static String driverPath = "C:\\DATA\\Selenium_Drivers\\chromedriver.exe";
     //public static String driverPath = "src/test/resources/chromedriver.exe";
