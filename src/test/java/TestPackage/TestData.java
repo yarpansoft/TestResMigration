@@ -12,5 +12,6 @@ public class TestData {
 
     public static int timeoutDefault = 10;
 
+    public static boolean isTestShouldBePassed = false;
 
 }
