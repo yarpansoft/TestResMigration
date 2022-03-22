@@ -1,23 +1,4 @@
 
-##### Table of Contents
-[Headers](#headers)  
-[Emphasis](#emphasis)  
-...snip...    
-
-
-# Table of Contents
-1. [Example](#example)
-2. [Example2](#example2)
-3. [Third Example](#third-example)
-4. [Fourth Example](#fourth-examplehttpwwwfourthexamplecom)
-
-
-
-
-
-## Headers
-
-
 
 An h1 header gf
 ============
@@ -63,16 +44,6 @@ from the left side). Here's a code sample:
 
 As you probably guessed, indented 4 spaces. By the way, instead of
 indenting the block, you can use delimited blocks, if you like:
-
-<a name="headers"/>
-<a name="headers2"/>
-
-
-## Example
-## Example2
-## Third Example
-## [Fourth Example](http://www.fourthexample.com)
-
 
 
 ~~~
