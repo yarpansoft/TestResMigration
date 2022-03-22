@@ -1,4 +1,4 @@
-package TestPackage;
+package XTRA;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;

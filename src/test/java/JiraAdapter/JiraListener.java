@@ -1,10 +1,11 @@
-package TestPackage;
+package JiraAdapter;
 
-import JiraAdapter.JiraActions;
+import com.mashape.unirest.http.HttpResponse;
+import com.mashape.unirest.http.JsonNode;
 import org.testng.ITestResult;
 import org.testng.TestListenerAdapter;
 
-public class TestResultListener extends TestListenerAdapter {
+public class JiraListener extends TestListenerAdapter {
 
         @Override
         public void onTestSuccess(ITestResult result) {
@@ -25,11 +26,12 @@ public class TestResultListener extends TestListenerAdapter {
                 JiraActions jiraActions = new JiraActions();
                 if (!jiraActions.isJiraIssueOpened(testFullName)){
                         System.out.println("No opened Issue for Failed Test. Creating Issue...");
-                        jiraActions.createJiraIssue(testFullName, testResultException);
+                        HttpResponse<JsonNode> response = jiraActions.createJiraIssue(testFullName, testResultException);
+                        System.out.println(response.getBody().getObject().toString());
+                        if (JiraSettings.isNewIssueShouldBeMovedToSprint){
+                                jiraActions.setJiraIssueToSprint(jiraActions.getJiraCurrentSprintId(), jiraActions.getIssueIdFromResponseCreate(response));
+                        }
                 }
-//                if (JiraSettings.isNewIssueShouldBeMovedToSprint){
-//                        jiraActions.setJiraIssueToCurrentSprint(jiraActions.getJiraCurrentSprintID());
-//                }
         }
 
 

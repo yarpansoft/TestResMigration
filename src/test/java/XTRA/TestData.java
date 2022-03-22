@@ -1,4 +1,4 @@
-package TestPackage;
+package XTRA;
 
 public class TestData {
     public static String driverPath = "C:\\DATA\\Selenium_Drivers\\chromedriver.exe";
