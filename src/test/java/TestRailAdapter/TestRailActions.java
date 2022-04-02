@@ -129,7 +129,6 @@ public class TestRailActions {
         return response;
     }
 
-
     public static String getTimeStamp(String timeStampFormat) {
         Date date = Calendar.getInstance().getTime();
         DateFormat dateFormat = new SimpleDateFormat(timeStampFormat);
