@@ -1,201 +1,213 @@
 
-Test Result Migration Java (TRM)
-============
-**Tool is designed for autocompleting Test Management Systems and Bug Tracking Systems by results of automation tests.**
+<br />
+<br />
+<br />
 
-*VERSION: Java + Maven + Jira + TestRail*
+# 3. PractiTest Adapter <a name="paragraph3"></a>
+## 3.1. Logics Description <a name="subparagraph31"></a>
 
+After getting test result from autotest FW we need to define an Instance in PractiTest, 
+where result should be placed. 
 
+If (according settings) we should not create new Instance, we get last existing 
+and use it for result placing.
 
-# Table of contents
-1. [Jira Adapter](#paragraph1)
-   1. [Logics Description](#subparagraph11)
-   2. [Creating test / demo Jira account (optional)](#subparagraph12)
-   3. [Jira Settings](#subparagraph13)
-   4. [Framework Settings](#subparagraph14)
-   5. [Usage sample](#subparagraph15)
+If we should create new Instance, we need:
+* Test ID
+* TestSet ID
 
+If Test with same Name found, tool use its Test ID
 
-2. [TestRail Adapter](#paragraph2)
-   1. [Logics Description](#subparagraph21)
-   2. [Creating test / demo TestRail account (optional)](#subparagraph22)
-   3. [TestRail Settings](#subparagraph23)
-   4. [Framework Settings](#subparagraph24)
-   5. [Usage sample](#subparagraph25)
-
-
-
-# 1. Jira Adapter <a name="paragraph1"></a>
-## 1.1. Logics Description <a name="subparagraph11"></a>
-
-In case test Failed in test automation FW, logic is:
+If not, new Test with "PackageName.ClassName.MethodName" created and tools use its ID 
 ~~~
-if (test.status == Failed){
-    if (!Jira has open issue with same summary){ 
-        create issue in Jira with "To Do" status and with summary = PackageName.ClassName.TestName 
-    } 
-}
+GET TestSet 
+check Settings if use DEFAULT, SUITENAME or NEW_timestamp]
+    if use SUITENAME, search for Suite Name
+        if exist, return ID of last
+        if not exist, create with Test Suite Name and return ID
+    if NEW_timestamp, create TestSet with TimeStamp and return ID
+    if NONE ABOVE, use DEFAULT, check Settings and Return TestSet ID
 ~~~
 
+Finally, publishing test results to PractiTest according to their status (Passed, Failed) 
+with validation message and using attributes:
+* Instance ID
+* Test ID
+* TestSet ID
 
-In case test Passed in test automation FW, logic is:
-~~~
-if (test.status == Passed){
-    if (Jira has open issues with same summary){
-        close ALL open issues in Jira with summary = PackageName.ClassName.TestName
-    }
-}
-~~~
-List of statuses that should be processed as "opened" can be tuned in Settings.
+---
 
+## 3.2. Creating test / demo PractiTest account (optional) <a name="subparagraph32"></a>
 
+*If you do not plan to check how tool works on test environment or if you are already have test account ,
+you can skip this step and proceed to next one - 3.3. PractiTest Settings*
 
+Open URL and create account
 
-## 1.2. Creating test / demo Jira account (optional) <a name="subparagraph12"></a>
-If you do not plan to check how framework works on test environment or if you are already
-have test account in Jira, skip this step and proceed to next one - 1.3. Jira Settings
+https://www.practitest.com/free-trial-b/
 
-You can also try to use initial demo credentials if trial not expired yet
-~~~
-https://testsigman2.atlassian.net/
-username: testsigman+2@gmail.com
-pass for web login: ezHxlEAukYRKOYgl007c1E69
-~~~
+Go to email inbox and confirm account by clicking the link
 
-To create own test Jira Account open URL
-
-https://www.atlassian.com/software/jira/free
-
-Select email for admin's account
-
-Create site
-
-Select a project Template (for example, Scrum)
-
-Select a project Type (for example, Team-managed Project)
-
-Set Project Name and Project Key (for example, Test Project and TP)
-
-In Backlog Page create any Issue (Story or Bug) and drug it to Sprint Area.
-Now you can Start Sprint and to see issues on the Board.
-
-Project is ready.
+Open  home URL
 
 
 
-## 1.3. Jira Settings <a name="subparagraph13"></a>
+---
 
-### Create user for autotest reporting
-Open Jira Settings and create special user for autotest reporting,
-for example - autotests@yourdomain.com
 
-This user will be used in "Created by" property of Bugs in Jira
+## 3.3. PractiTest Settings <a name="subparagraph33"></a>
 
-### Create API token for user
+ENABLING API IN PROJECT
 
-Open link under new test user credentials
+Ensure that API enable for Project. Click Gear icon in right-upper corner:
 
-https://id.atlassian.com/manage-profile/security/api-tokens
+* Automation Tab - Automation settings - API - Enable API TOKEN to act as a differnent user (user impersonation)
 
-and create API token for user
+Impersonation is needed to create tests and override fields such as author_id, changed-by-id
 
-## 1.4. Framework Settings <a name="subparagraph14"></a>
+---
+GETTING API TOKEN 
+
+Login as Account Owner
+
+* Account Settings - Manage Users - Account Owners and Personal API Tokens
+
+Select or Create user for Autotest. For selected user:
+
+* Personal Api Token - Change - Enable
+
+Login as Autotest user
+
+* Project Settings - Personal - User Settings - Personal API Token - Generate
+
+More info about API tokens 
+https://www.practitest.com/help/account/account-api-tokens/
+
+---
+
+## 3.4. Framework Settings <a name="subparagraph34"></a>
 
 ### Modify pom.xml file
 
 Add Maven dependencies for latest release versions of components (if project does not have them yet)
-
-
-https://mvnrepository.com/artifact/org.testng/testng
 
 https://mvnrepository.com/artifact/com.mashape.unirest/unirest-java
 
 
 ### Copy files to your Framework
 
-Copy **JiraAdapter package** to
+Copy **PractiTestAdapter package** to
 
 ~~~
-project\scr\test\java\JiraAdapter
+project\scr\test\java\PractiTestAdapter
 ~~~
 
 Move then package to any other place you want by Refactoring option
 
-### Modify Base Test class by add annotation for class
+---
 
+### Modify Base Test class 
+Add Listener for class
 ~~~
-@Listeners(JiraAdapter.JiraListener.class)
+@Listeners(PractiTestAdapter.PractiTestListener.class)
 public class TestSuite {
 ...
 ~~~
 or if you already have listener
 ~~~
-@Listeners({JiraAdapter.JiraListener, TestRailAdapter.TestRailListener.class})
+@Listeners({JiraAdapter.JiraListener.class, PractiTestAdapter.PractiTestListener.class})
 public class TestSuite {
 ...
 ~~~
+Also add to your @BeforeSuite method of base class
+~~~
+    @BeforeSuite
+    public void selectTestSet(){
+        System.out.println("TestSetId = " + PractiTestSettings.getSetId());
+        PractiTestAdapter.PractiTestActions practiTestActions = new PractiTestAdapter.PractiTestActions();
+        practiTestActions.selectTestSetId(this.getClass().getCanonicalName());
+    }
+~~~
+This code may be added to @BeforeTest method instead 
+if logic og TestSet creation/usage is similar for all Suites according to youe workflow
 
-### Fill-in settings of your Jira Project
+---
+
+### Fill-in settings of your PractiTest Project
 Setting are stored in class:
 ~~~
-src\test\java\JiraAdapter\JiraSettings.class**
+src\test\java\PractiTestAdapter\PractiTestSettings.class**
+~~~
+Open PractiTest and get URL from address bar 
+
+According to your location, base WWW may be various
+~~~
+https://www.practitest.com/
+https://eu1-prod-api.practitest.app/
+~~~
+Fill-in fields of **PractiTestSettings.class**
+~~~
+baseURL = "your-baseWWW" + "/api/v2/projects/";
 ~~~
 
-Open any Bug in Jira UI and it's URL looks like
+---
+
+GET PROJECT ID
+
+Click Gear icon in right-upper corner
+
+Project Tab - Project ID 12345 (used with API)
 ~~~
-https://{your-site-name}.atlassian.net/browse/{your-project-name}-505
+projectId = 12345;
 ~~~
-Fill-in fields of **JiraSettings.class**
+GET USER ID
+
+To get list of Users with IDs, send simple CURL request
 ~~~
-siteName = "your-site-name";
-projectName = "your-project-name";
+curl -H "Content-Type: application/json" \
+https://api.practitest.com/api/v2/users.json?api_token=YOUR_TOKEN
+~~~
+Find user you want to use for Autotest and fill-in parameter with user's ID
+~~~
+userId = 28799;
+~~~
+More details on
+https://www.practitest.com/api-v2/#get-all-users-in-your-account
+
+Specify the text that should be added to PractiTest for **Passed tests** as comment
+~~~
+testResultCommentForSuccessTest = "Automation test passed successfully";
 ~~~
 
-fill in username and token to fields:
-~~~
-userName = "autotests@yourdomain.com";
-userToken = "your-jira-token-for-user";
-~~~
+---
 
-Type the names of Jira statuses that you want to:
-* tool accept as opened and do not open new issue with same summary if test Failed
-* tool accept as opened and close all of them if test with same Summary is Passed
+TUNE THE LOGIC ACCORDING TO YOUR WORKFLOW
 
 ~~~
-issueOpenStatus1 = "To Do";
-issueOpenStatus2 = "In Progress";
-issueOpenStatus3 = "Testing";
+isCreateNewInstanceForResults = true;
 ~~~
-
-You need to specify transition ID for moving Jira issue to Status "Done" (it is specific to your Project's Workflow)
-
-To get this Status ID, send GET API request
-
+This parameter specifies if create new Instance of "Test-TestSet" for publishing test results or use old last one
 ~~~
-curl --request GET \
---url 'https://{your-domain}.atlassian.net/rest/api/3/issue/{projectName}-{any_BugID}/transitions
---user 'email@example.com:<api_token>' \
---header 'Accept: application/json'
+isTestSetUse_SuiteName = true;
 ~~~
+This parameter specifies if you want to use Java package names and Class names as 
+TestSets names in PractiTest 
+~~~
+isTestSetUse_NewTimeStamp = false;
+~~~
+This parameter specifies if you want to use current time stamp as
+TestSets names in PractiTest
+~~~
+testSetId_Default = 527617;
+~~~
+Here you can point specific TestSet ID where test results will be published 
+if none of logic above do not suite your workflow.
 
-In Response Body you will see smth like that
-~~~
-...
-{
-    "id": "31",
-    "name": "Done",
-    "to": {
-...
-~~~
+TestSet ID you can get from address bar after opening this TestSet in browser.
 
-In this example transitionID is 31,
-so put this value into option field:
+---
 
-~~~
-transitionIdDone = 31;
-~~~
-
-## 1.5. Usage sample <a name="subparagraph15"></a>
+## 3.5. Usage sample <a name="subparagraph35"></a>
 
 Usage is pretty simple.
 
@@ -206,32 +218,8 @@ public class TestSuite {
 public static boolean isTestShouldBePassed = false;
 ~~~
 
-Then run one or all tests and get results in Jira web
+Then run one or all tests and get results in PractiTest web
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+<br />
+<br />
+<br />
