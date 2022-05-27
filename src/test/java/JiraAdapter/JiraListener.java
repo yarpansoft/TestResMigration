@@ -24,14 +24,7 @@ public class JiraListener extends TestListenerAdapter {
                 System.out.println("testResult: \n" + testResultException);
                 System.out.println("Seaching for opened Issue for Failed Test...");
                 JiraActions jiraActions = new JiraActions();
-                if (!jiraActions.isJiraIssueOpened(testFullName)){
-                        System.out.println("No opened Issue for Failed Test. Creating Issue...");
-                        HttpResponse<JsonNode> response = jiraActions.createJiraIssue(testFullName, testResultException);
-                        System.out.println(response.getBody().getObject().toString());
-                        if (JiraSettings.isNewIssueShouldBeMovedToSprint){
-                                jiraActions.setJiraIssueToSprint(jiraActions.getJiraCurrentSprintId(), jiraActions.getIssueIdFromResponseCreate(response));
-                        }
-                }
+                jiraActions.addJiraIssue(testFullName, testResultException);
         }
 
 

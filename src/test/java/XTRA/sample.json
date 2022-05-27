@@ -1,0 +1,65 @@
+[
+{
+    "testtype": "Cucumber",
+    "fields": {
+      "summary": "This tests the addition of 2 numbers.",
+      "project": { "key": "CALC" }
+    },
+    "gherkin_def": "Given I have entered <input_1> into the calculator\nAnd I have entered <input_2> into the calculator\nWhen I press <button>\nThen the result should be <output> on the screen\n\n  Examples:\n    | input_1 | input_2 | button | output |\n    | 20      | 30      | add    | 50     |\n    | 2       | 5       | add    | 7      |\n    | 0       | 40      | add    | 40     |\n    | 1       | 40      | add    | 41     |",
+    "xray_test_sets": ["ts1"]
+  },
+  {
+    "testtype": "Manual",
+    "fields": {
+      "summary": "This tests the Subtraction of two numbers.",
+      "project": { "key": "CALC" }
+    },
+    "update": {
+      "issuelinks": [
+        {
+          "add": {
+            "type": {
+              "name": "Test"
+            },
+            "outwardIssue": {
+              "key": "CALC-123"
+            }
+          }
+        }
+      ]
+    },
+    "steps": [
+      {
+        "action": "I choose the operation of the calculator *Subtraction*",
+        "data": "",
+        "result": "The operation must appear selected."
+      },
+      {
+        "action": "I enter the input into the calculator",
+        "data": "I1: 5\nI2: 2",
+        "result": ""
+      },
+      {
+        "action": "I press the *Calculate* button",
+        "result": "The result *3* should be displayed in the screen, on the right of the \"=\" sign."
+      }
+    ],
+    "xray_test_sets": ["ts1", "CALC-100"]
+  },
+  {
+    "testtype": "Generic",
+    "fields": {
+      "summary": "CanMultiply",
+      "project": { "key": "CALC" }
+    },
+    "unstructured_def": "x.CalculatorTests.CanMultiply",
+    "xray_test_repository_folder": "Generic Tests/Arithmetic Tests"
+  },
+  {
+    "xray_issue_type": "testset",
+    "xray_id": "ts1",
+    "fields": {
+      "summary": "Calculator tests"
+    }
+  }
+]

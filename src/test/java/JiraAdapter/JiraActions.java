@@ -7,6 +7,17 @@ import com.mashape.unirest.http.exceptions.UnirestException;
 
 public class JiraActions {
 
+    public void addJiraIssue(String testFullName, String testResultException) {
+        if (!isJiraIssueOpened(testFullName)) {
+            System.out.println("No opened Issue for Failed Test. Creating Issue...");
+            HttpResponse<JsonNode> response = createJiraIssue(testFullName, testResultException);
+            System.out.println(response.getBody().getObject().toString());
+            if (JiraSettings.isNewIssueShouldBeMovedToSprint) {
+                setJiraIssueToSprint(getJiraCurrentSprintId(), getIssueIdFromResponseCreate(response));
+            }
+        }
+    }
+
     public HttpResponse<JsonNode> createJiraIssue(String issueSummary, String issueDescription) {
         String body = "{\"fields\": {\"summary\": \""+ issueSummary + "\",\"issuetype\": {\"name\": \"Bug\"},\"project\": {\"key\": \""
                 + JiraSettings.projectName + "\"},\"description\": {\"type\": \"doc\",\"version\": 1,\"content\": [{\"type\": "
@@ -55,13 +66,6 @@ public class JiraActions {
             String issueStatusName = getIssueStatusNameFromResponse(response, i);
             System.out.println("[" + i + "] issueID: " + issueID + ", issueStatusName: " + issueStatusName);
 
-//            for (String issueOpenStatus : JiraSettings.issueOpenStatuses) {
-//                if(issueStatusName.equals(issueOpenStatus)){
-//
-//                }
-//                break;
-//            }
-
             if (issueStatusName.equals(JiraSettings.issueOpenStatus1)||issueStatusName.equals(JiraSettings.issueOpenStatus2)
                     ||issueStatusName.equals(JiraSettings.issueOpenStatus3)){
                 System.out.println("issueStatusName: " + issueStatusName + ", changing status...");
@@ -89,7 +93,7 @@ public class JiraActions {
     }
 
 
-//    public int getJiraIssueIDBySummary(String issueSummary){
+    public int getJiraIssueIDBySummary(String issueSummary){
 //        int issueID;
 //        String requestUrl = "https://" + JiraSettings.siteName + ".atlassian.net/rest/api/3/search?jql=summary~" + issueSummary;
 //        HttpResponse<JsonNode> response = responseBuilderGet(requestUrl);
@@ -105,8 +109,8 @@ public class JiraActions {
 //            System.out.println("FAILED! found 0 or more than one NOT CLOSED issue with given issueSummary");
 //            issueID = -1;
 //        }
-//        return issueID;
-//    }
+        return 0; //issueID;
+   }
 
 
     public HttpResponse<JsonNode> responseBuilderGet(String requestUrl){
